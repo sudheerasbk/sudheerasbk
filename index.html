@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Web App</title>
+  <style>
+    body { font-family: system-ui, Arial; margin: 0; background:#f6f7fb; }
+    header { padding: 16px; background: white; position: sticky; top: 0; border-bottom: 1px solid #e5e7eb; }
+    h1 { font-size: 18px; margin: 0; }
+    main { padding: 16px; max-width: 520px; margin: 0 auto; }
+    .card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    input, button, textarea {
+      width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 16px;
+      box-sizing: border-box;
+    }
+    button { background: #111827; color: white; border: none; cursor: pointer; margin-top: 10px; }
+    button:active { transform: scale(0.99); }
+    .row { display:flex; gap:10px; }
+    .row > * { flex: 1; }
+    .muted { color:#6b7280; font-size: 13px; }
+    .pill { display:inline-block; padding: 4px 10px; border-radius: 999px; background:#eef2ff; color:#3730a3; font-size:12px; }
+    ul { margin: 10px 0 0; padding-left: 18px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Web App <span class="pill">GitHub Pages</span></h1>
+    <div class="muted">Works on mobile • Saves data in your phone (for now)</div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="row">
+        <input id="item" placeholder="Type something..." />
+        <button onclick="addItem()">Add</button>
+      </div>
+      <div class="muted" style="margin-top:8px;">This is a starter. Next we’ll replace with your real features.</div>
+    </div>
+
+    <div class="card">
+      <b>Saved items</b>
+      <ul id="list"></ul>
+      <button onclick="clearAll()" style="background:#ef4444;">Clear</button>
+    </div>
+  </main>
+
+  <script>
+    const KEY = "myapp_items_v1";
+    const listEl = document.getElementById("list");
+    const inputEl = document.getElementById("item");
+
+    function getItems() {
+      return JSON.parse(localStorage.getItem(KEY) || "[]");
+    }
+    function setItems(items) {
+      localStorage.setItem(KEY, JSON.stringify(items));
+      render();
+    }
+    function addItem() {
+      const v = inputEl.value.trim();
+      if (!v) return;
+      const items = getItems();
+      items.unshift({ text: v, ts: new Date().toISOString() });
+      setItems(items);
+      inputEl.value = "";
+      inputEl.focus();
+    }
+    function clearAll() {
+      localStorage.removeItem(KEY);
+      render();
+    }
+    function render() {
+      const items = getItems();
+      listEl.innerHTML = items.length
+        ? items.map(x => `<li>${escapeHtml(x.text)} <span class="muted">(${new Date(x.ts).toLocaleString()})</span></li>`).join("")
+        : `<li class="muted">No items yet.</li>`;
+    }
+    function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    render();
+    inputEl.addEventListener("keydown", (e)=>{ if(e.key==="Enter") addItem(); });
+  </script>
+</body>
+</html>
